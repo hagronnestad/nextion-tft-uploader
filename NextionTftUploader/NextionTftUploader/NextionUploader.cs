@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.IO.Ports;
+using System.Text;
 
 namespace NextionTftUploader {
     public class NextionUploader {
@@ -14,6 +15,12 @@ namespace NextionTftUploader {
         /// <param name="baudRate"></param>
         public void Upload(string fileName, string port, int baudRate) {
             var sp = new SerialPort(port, baudRate, Parity.None, 8, StopBits.One);
+
+            // This is very important when using any SerialPort methods that make use of string or char types
+            // Byte values will be truncated to byte values allowed in codepage
+            // \xff becomes \x3f for ASCII which is the default encoding
+            // https://social.msdn.microsoft.com/Forums/en-US/efe127eb-b84b-4ae5-bd7c-a0283132f585/serial-port-sending-8-bit-problem?forum=Vsexpressvb
+            sp.Encoding = Encoding.GetEncoding(28591);
 
             sp.Open();
 
@@ -64,9 +71,11 @@ namespace NextionTftUploader {
                 return;
             }
 
+            var chunkSize = 4096;
+
             // Send TFT data
-            for (int offset = 0; offset <= data.Length; offset += 4096) {
-                var length = ((data.Length - offset) >= 4096) ? 4096 : data.Length - offset;
+            for (int offset = 0; offset <= data.Length; offset += chunkSize) {
+                var length = ((data.Length - offset) >= chunkSize) ? chunkSize : data.Length - offset;
 
                 Console.Write($"Writing {length} bytes, {offset} bytes written ...                      ");
                 Console.CursorLeft = 0;

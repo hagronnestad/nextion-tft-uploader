@@ -12,7 +12,7 @@ namespace NextionTftUploader {
         }
 
         public static string NextionReadConnectResponse(this SerialPort sp) {
-            return sp.ReadTo(new string(new char[] { '\x3f', '\x3f', '\x3f' }));
+            return sp.ReadTo(new string(new char[] { '\xff', '\xff', '\xff' }));
         }
 
     }

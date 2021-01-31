@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using System.IO.Ports;
 using System.Text;
@@ -71,9 +71,11 @@ namespace NextionTftUploader {
                 return;
             }
 
+            var chunkSize = 4096;
+
             // Send TFT data
-            for (int offset = 0; offset <= data.Length; offset += 4096) {
-                var length = ((data.Length - offset) >= 4096) ? 4096 : data.Length - offset;
+            for (int offset = 0; offset <= data.Length; offset += chunkSize) {
+                var length = ((data.Length - offset) >= chunkSize) ? chunkSize : data.Length - offset;
 
                 Console.Write($"Writing {length} bytes, {offset} bytes written ...                      ");
                 Console.CursorLeft = 0;
